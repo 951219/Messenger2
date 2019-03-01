@@ -177,7 +177,7 @@ public class MessengerUtilities {
 
         if (listSize != readMessagesCount) {
             //System.out.println(loggedInUser + " new messages:");
-            for (int counter = readMessagesCount+1; counter < listSize; counter++) {
+            for (int counter = readMessagesCount; counter < listSize; counter++) {
                 System.out.println("(New) " + messages.get(counter));
 
 
