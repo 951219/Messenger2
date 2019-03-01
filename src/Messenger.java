@@ -38,9 +38,7 @@ public class Messenger {
                             messengerUtilities.logOut();
                             break;
                         }
-                        if (loggedInUserInput.equalsIgnoreCase("4")){ //for testing
-                            messengerUtilities.printUsers();
-                        }
+
                     }
                 }
             }

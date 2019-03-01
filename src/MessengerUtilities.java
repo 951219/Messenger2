@@ -8,6 +8,7 @@ import java.util.Scanner;
 
 import static java.nio.file.StandardOpenOption.APPEND;
 
+
 public class MessengerUtilities {
 
 
@@ -132,17 +133,25 @@ public class MessengerUtilities {
             } else {
                 String chatName = loggedInUser;
                 for (String name : recipients) {
-                    chatName = chatName.concat("_" + name);
+                    chatName = chatName.concat("-" + name);
                 }
-                Path path = Paths.get(chatName + ".txt");
-                Files.write(pathToFileNames, (chatName + ".txt" + "\n").getBytes(), APPEND);
+                Path path = Paths.get("chats/"+chatName + ".txt");
+                Files.write(pathToFileNames, (chatName  + ".txt" + "\n").getBytes(), APPEND); //append means to the end of file, \n means that a new line.
+
+
+
+
+
+
+
 
                 if (!Files.exists(path)) {
                     Files.createFile(path);
                     Files.write(path, ("1" + "\n").getBytes(), APPEND);
+                    Files.write(path, ("Chat for: "+chatName.replace("-",", ") + "\n").getBytes(), APPEND);
+
                 }
 
-                //Files.write(path,(chatName) / i'll add a which has a name of all the participants.
                 System.out.println("Write your message.");
                 String message = loggedInUser + " says: " + scanner.nextLine();
                 Files.write(path, (message + "\n").getBytes(), APPEND);
@@ -162,13 +171,13 @@ public class MessengerUtilities {
         }
     }
 
-    public void newMessages(Path path, List<String> messages) throws IOException {
+    public void printOnlyNewMessages(Path path, List<String> messages) throws IOException {
         int listSize = messages.size();
         int readMessagesCount = Integer.parseInt(messages.get(0));
 
         if (listSize != readMessagesCount) {
             //System.out.println(loggedInUser + " new messages:");
-            for (int counter = readMessagesCount; counter < listSize; counter++) {
+            for (int counter = readMessagesCount+1; counter < listSize; counter++) {
                 System.out.println("(New) " + messages.get(counter));
 
 
@@ -184,20 +193,24 @@ public class MessengerUtilities {
         List<String> createdChats = Files.readAllLines(pathToFileNames);
         for (int counter = 0; counter < createdChats.size(); counter++) {
             if (createdChats.get(counter).contains(loggedInUser)) {
-                Path path = Paths.get(createdChats.get(counter));
+                Path path = Paths.get("chats/"+createdChats.get(counter));
                 List<String> messages = Files.readAllLines(path);
                 if (haveNewMessages(messages)) {
-                    newMessages(path, messages);
-                } else {
+                    printOnlyNewMessages(path, messages);
+                } else {/*else {
                     for (String message : messages) {
                         System.out.println(message);
+                    }*/
+
+                    for (int counter2 = 1; counter2 < messages.size(); counter2++) {
+                        System.out.println(messages.get(counter2));
+
+
                     }
 
                 }
             }
         }
-
-
     }
 
     public void logOut() throws IOException {
@@ -212,3 +225,4 @@ public class MessengerUtilities {
         }
     }
 }
+
