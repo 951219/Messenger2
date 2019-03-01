@@ -147,7 +147,7 @@ public class MessengerUtilities {
 
                 if (!Files.exists(path)) {
                     Files.createFile(path);
-                    Files.write(path, ("1" + "\n").getBytes(), APPEND);
+                    Files.write(path, ("2" + "\n").getBytes(), APPEND);
                     Files.write(path, ("Chat for: "+chatName.replace("-",", ") + "\n").getBytes(), APPEND);
 
                 }
@@ -177,13 +177,15 @@ public class MessengerUtilities {
 
         if (listSize != readMessagesCount) {
             //System.out.println(loggedInUser + " new messages:");
-            for (int counter = readMessagesCount; counter < listSize; counter++) {
+            System.out.println(messages.get(1));
+            for (int counter = readMessagesCount+1; counter < listSize; counter++) {
                 System.out.println("(New) " + messages.get(counter));
 
 
             }
             messages.set(0, Integer.toString(listSize));
             Files.write(path, messages);
+            System.out.println();
             //adding et iga[ks n'eks eraldi et kas tal mingeid s]numeid avamata.
         }
     }
@@ -201,12 +203,13 @@ public class MessengerUtilities {
                     for (String message : messages) {
                         System.out.println(message);
                     }*/
-
-                    for (int counter2 = 1; counter2 < messages.size(); counter2++) {
+                    System.out.println(messages.get(1));
+                    for (int counter2 = 2; counter2 < messages.size(); counter2++) {
                         System.out.println(messages.get(counter2));
 
 
                     }
+                    System.out.println();
 
                 }
             }
