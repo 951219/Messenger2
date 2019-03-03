@@ -2,7 +2,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
@@ -112,15 +114,63 @@ public class MessengerUtilities {
         System.out.println();
     }
 
+    public int doesChatExsist(List<String> recipients) throws IOException {
+        boolean allNamesInName = false;
+        boolean nrOfCharacters = false;
+        int rightChatNameNr = 0;
+
+        int listSize = recipients.size();//nr of recipients
+        int listNameCharAmount = loggedInUser.length() + listSize + 4;//+ listisuurus-1 kuna kui nt 4 inimest siis 3 space'i, +4 kuna .txt
+        for (String name : recipients) {
+            listNameCharAmount = listNameCharAmount + name.length();
+        }
+
+        List<String> createdChats = Files.readAllLines(pathToFileNames);
+        for (int counter = 0; counter < createdChats.size(); counter++) {
+            for (String name : recipients) {
+                String chatName = createdChats.get(counter);
+                if (chatName.contains(name)) {
+
+                } else {
+                    break;
+                }
+                //String path = "chats/" + createdChats.get(counter);
+                if (recipients.get(recipients.size() - 1) == name) {
+                    allNamesInName = true;
+                    rightChatNameNr = counter;
+
+                    if (chatName.length() == listNameCharAmount) {
+                        nrOfCharacters = true;
+                    }
+                }
+
+            }
+        }
+
+        if (allNamesInName && nrOfCharacters) {
+
+            return rightChatNameNr;
+        } else {
+            return -1;
+        }
+
+    }
+
+
     public void sendANewMessage() throws IOException {
         List<String> recipients = new ArrayList<>();
         System.out.println("For whom do you want to send a message?");
-        System.out.println("You can choose multiple people. done=done");
+        System.out.println("You can choose multiple people. \nif done=done");
         printUsers();
         //if (scanner.nextLine()=="") / kui esimeseks inimeseks kirjutab done
         while (true) {
             System.out.println("Enter a persons name.");
             String recipient = scanner.nextLine();
+
+            if (recipient.equalsIgnoreCase("done") && recipients.size() == 0) {
+                System.out.println("You have to enter at least one person.");
+                break;
+            }
 
             if (!recipient.equalsIgnoreCase("done")) {
                 if (isUserExisting(recipient)) {
@@ -129,91 +179,115 @@ public class MessengerUtilities {
                     System.out.println("There is no user with this name");
                 }
 
-
             } else {
-                String chatName = loggedInUser;
-                for (String name : recipients) {
-                    chatName = chatName.concat("-" + name);
+                    //if chat exisits.
+                int correctChat = doesChatExsist(recipients);
+                if (correctChat != -1) {
+                    List<String> createdChats = Files.readAllLines(pathToFileNames);
+                    int chatNumber = correctChat;
+                    String correctChatName = createdChats.get(chatNumber);
+                    Path path = Paths.get("chats/" + correctChatName);
+
+
+                    System.out.println("Write your message.");
+                    String message = loggedInUser + " says: " + scanner.nextLine();
+                    String timeStamp = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss ").format(new Date());
+                    Files.write(path, (timeStamp + message + "\n").getBytes(), APPEND);
+                    break;
+
+                } else {
+                    //if not exsists then it will create a new chat
+                    String chatName = loggedInUser;
+                    for (String name : recipients) {
+                        chatName = chatName.concat("-" + name);
+                    }
+                    Path path = Paths.get("chats/" + chatName + ".txt");
+                    Files.write(pathToFileNames, (chatName + ".txt" + "\n").getBytes(), APPEND); //append means to the end of file, \n means that a new line.
+
+                    if (!Files.exists(path)) {
+                        Files.createFile(path);
+                        //Files.write(path, ("2" + "\n").getBytes(), APPEND);
+                        Files.write(path, ("Chat for: " + chatName.replace("-", ", ") + "\n").getBytes(), APPEND);
+
+                    }
+
+                    System.out.println("Write your message.");
+                    String message = loggedInUser + " says: " + scanner.nextLine();
+                    String timeStamp = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss ").format(new Date());
+                    Files.write(path, (timeStamp + message + "\n").getBytes(), APPEND);
+                    break;
                 }
-                Path path = Paths.get("chats/"+chatName + ".txt");
-                Files.write(pathToFileNames, (chatName  + ".txt" + "\n").getBytes(), APPEND); //append means to the end of file, \n means that a new line.
-
-
-
-
-
-
-
-
-                if (!Files.exists(path)) {
-                    Files.createFile(path);
-                    Files.write(path, ("2" + "\n").getBytes(), APPEND);
-                    Files.write(path, ("Chat for: "+chatName.replace("-",", ") + "\n").getBytes(), APPEND);
-
-                }
-
-                System.out.println("Write your message.");
-                String message = loggedInUser + " says: " + scanner.nextLine();
-                Files.write(path, (message + "\n").getBytes(), APPEND);
-                break;
             }
-        }
 
-    }
-
-    public boolean haveNewMessages(List<String> messages) {
-        int listSize = messages.size();
-        int readMessagesCount = Integer.parseInt(messages.get(0));
-        if (listSize != readMessagesCount) {
-            return true;
-        } else {
-            return false;
         }
     }
 
-    public void printOnlyNewMessages(Path path, List<String> messages) throws IOException {
-        int listSize = messages.size();
-        int readMessagesCount = Integer.parseInt(messages.get(0));
+//    public boolean haveNewMessages(List<String> messages) {
+//        int listSize = messages.size();
+//        int readMessagesCount = Integer.parseInt(messages.get(0));
+//        if (listSize != readMessagesCount) {
+//            return true;
+//        } else {
+//            return false;
+//        }
+//    }
 
-        if (listSize != readMessagesCount) {
-            //System.out.println(loggedInUser + " new messages:");
-            System.out.println(messages.get(1));
-            for (int counter = readMessagesCount+1; counter < listSize; counter++) {
-                System.out.println("(New) " + messages.get(counter));
-
-
-            }
-            messages.set(0, Integer.toString(listSize));
-            Files.write(path, messages);
-            System.out.println();
-            //adding et iga[ks n'eks eraldi et kas tal mingeid s]numeid avamata.
-        }
-    }
+//    public void printOnlyNewMessages(Path path, List<String> messages) throws IOException {
+//        int listSize = messages.size();
+//       int readMessagesCount = Integer.parseInt(messages.get(0));
+//
+//        if (listSize != readMessagesCount) {
+//            System.out.println(loggedInUser + " new messages:");
+//            System.out.println(messages.get(1));
+//            for (int counter = 0; counter < listSize; counter++) {
+//                System.out.println(messages.get(counter));
+//
+//
+//            }
+//            messages.set(0, Integer.toString(listSize));
+//            Files.write(path, messages);
+//
+//            adding et iga[ks n'eks eraldi et kas tal mingeid s]numeid avamata.
+//        }
 
     public void readMessages() throws IOException {
 
         List<String> createdChats = Files.readAllLines(pathToFileNames);
         for (int counter = 0; counter < createdChats.size(); counter++) {
             if (createdChats.get(counter).contains(loggedInUser)) {
-                Path path = Paths.get("chats/"+createdChats.get(counter));
+                Path path = Paths.get("chats/" + createdChats.get(counter));
                 List<String> messages = Files.readAllLines(path);
-                if (haveNewMessages(messages)) {
-                    printOnlyNewMessages(path, messages);
-                } else {/*else {
-                    for (String message : messages) {
-                        System.out.println(message);
-                    }*/
-                    System.out.println(messages.get(1));
-                    for (int counter2 = 2; counter2 < messages.size(); counter2++) {
-                        System.out.println(messages.get(counter2));
+                int listSize = messages.size();
 
 
-                    }
-                    System.out.println();
+                for (int counter2 = 0; counter2 < listSize; counter2++) {
+                    System.out.println(messages.get(counter2));
+
 
                 }
+//                if (haveNewMessages(messages)) {
+//                } else {
+//
+//
+//                    else
+//                } {
+//                    for (String message : messages) {
+//                        System.out.println(message);
+//                    }
+//
+//                    System.out.println(messages.get(1));
+//                    for (int counter2 = 2; counter2 < messages.size(); counter2++) {
+//                        System.out.println(messages.get(counter2));
+//
+//
+//                    }
+//                    System.out.println();
+//
+//                }
             }
         }
+        System.out.println("End of messages");
+
     }
 
     public void logOut() throws IOException {

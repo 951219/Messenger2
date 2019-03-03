@@ -1,6 +1,9 @@
 
 import java.io.IOException;
 
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Scanner;
 
 
@@ -11,10 +14,12 @@ public class Messenger {
         Scanner scanner = new Scanner(System.in);
 
 
-        //Path path = Paths.get("usersInfo.txt");
+
 
 
         System.out.println("Welcome");
+
+
 
         while (true) {
             System.out.println("what do you want to do? 1=Add a new user / 2=log in.");
