@@ -1,5 +1,6 @@
 
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
@@ -14,6 +15,30 @@ import static java.nio.file.StandardOpenOption.APPEND;
 
 public class MessengerUtilities {
 
+    public MessengerUtilities() throws IOException {
+        if (!Files.exists(Paths.get("chats"))){
+            Files.createDirectory(Paths.get("chats"));
+        }
+
+        if (!Files.exists(Paths.get("channels"))){
+            Files.createDirectory(Paths.get("channels"));
+        }
+
+        if (!Files.exists(pathToUsersInfo)){
+            Files.createFile(pathToUsersInfo);
+        }
+        if (!Files.exists(pathToFileNames)){
+            Files.createFile(pathToFileNames);
+        }
+        if (!Files.exists(pathToOnlineUsers)){
+            Files.createFile(pathToOnlineUsers);
+        }
+        if (!Files.exists(pathToChannels)){
+            Files.createFile(pathToChannels);
+        }
+
+
+    }
 
     private Scanner scanner = new Scanner(System.in);
     private Path pathToUsersInfo = Paths.get("usersInfo.txt");
@@ -63,6 +88,7 @@ public class MessengerUtilities {
     }
 
     boolean logIn() throws IOException {
+
         List<String> usersInfo = Files.readAllLines(pathToUsersInfo);
         System.out.println("Enter your name");
         String name = scanner.nextLine();
@@ -357,6 +383,17 @@ public class MessengerUtilities {
                     }
                 });
 
+        Files.walk(Paths.get("channels/"))
+                .sorted(Comparator.reverseOrder())
+                .map(Path::toFile)
+                //.peek(System.out::println)
+                .forEach(it -> {
+                    if (it.isDirectory()) {
+
+                    } else {
+                        it.delete();
+                    }
+                });
 
     }
 
@@ -489,6 +526,8 @@ public class MessengerUtilities {
         }
 
 
+
     }
+
 
 }
