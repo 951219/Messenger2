@@ -21,7 +21,7 @@ public class Messenger {
             if (userInput.equalsIgnoreCase("2")) {
                 if (messengerUtilities.logIn()) {
                     while (true){
-                        System.out.println("What do you want to do? 1=open a chat / 2=read messages / 3=log out.");
+                        System.out.println("What do you want to do? 1=open a chat / 2=read messages / 3=channels  / 4=log out.");
                         String loggedInUserInput = scanner.nextLine();
 
                         if (loggedInUserInput.equals("1")) {
@@ -30,11 +30,15 @@ public class Messenger {
                         if (loggedInUserInput.equals("2")) {
                             messengerUtilities.readMessages();
                         }
-                        if(loggedInUserInput.equals("3")) {
+
+                        if (loggedInUserInput.equals("3")){
+                            messengerUtilities.userEntersChannelMenu();
+
+                        }
+                        if(loggedInUserInput.equals("4")) {
                             messengerUtilities.logOut();
                             break;
                         }
-
                     }
                 }
             }
